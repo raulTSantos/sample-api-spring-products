@@ -1,8 +1,13 @@
 package com.company.exception;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,6 +22,7 @@ import com.company.util.ResponseHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+	protected final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
 	@Override
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,
@@ -53,12 +59,44 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return ResponseHandler.error(apiError);
 	}
 
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	protected ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex,
+			WebRequest request) {
+
+		if (ex.getCause() instanceof ConstraintViolationException) {
+			return ResponseHandler.error(new ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()));
+		}
+		return ResponseHandler.error(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex));
+	}
+	
+
+	/*@Override
+	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
+			HttpStatus status, WebRequest request) {
+		if (status.is5xxServerError()) {
+			logger.error("An exception occured, which will cause a {} response", status, ex);
+		} else if (status.is4xxClientError()) {
+			logger.warn("An exception occured, which will cause a {} response", status, ex);
+		} else {
+			logger.debug("An exception occured, which will cause a {} response", status, ex);
+		}
+		ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "error occurred", ex);
+		return ResponseHandler.error(apiError);
+	}*/
+
+	@Override
+	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		 String message = "Malformed JSON request";
+		return  ResponseHandler.error(new ApiError(HttpStatus.BAD_REQUEST, message,ex));
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleInternalServerError(Exception ex, WebRequest request) {
-		
+		logger.error("handleInternalServerError {}\n", request.getContextPath(), ex);
 		ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "error occurred", ex);
-		
 		return ResponseHandler.error(apiError);
 	}
+	
 
 }
