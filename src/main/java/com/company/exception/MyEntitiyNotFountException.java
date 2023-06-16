@@ -5,4 +5,7 @@ package com.company.exception;
 public class MyEntitiyNotFountException extends RuntimeException{
 
 	private static final long serialVersionUID = 1L;
+	public MyEntitiyNotFountException(String message) {
+		super(message);
+	}
 }

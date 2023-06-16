@@ -1,5 +1,7 @@
 package com.company.exception;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,27 +70,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 		return ResponseHandler.error(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex));
 	}
-	
-
-	/*@Override
-	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
-			HttpStatus status, WebRequest request) {
-		if (status.is5xxServerError()) {
-			logger.error("An exception occured, which will cause a {} response", status, ex);
-		} else if (status.is4xxClientError()) {
-			logger.warn("An exception occured, which will cause a {} response", status, ex);
-		} else {
-			logger.debug("An exception occured, which will cause a {} response", status, ex);
-		}
-		ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "error occurred", ex);
-		return ResponseHandler.error(apiError);
-	}*/
 
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		 String message = "Malformed JSON request";
-		return  ResponseHandler.error(new ApiError(HttpStatus.BAD_REQUEST, message,ex));
+		String message = "Malformed JSON request";
+		return ResponseHandler.error(new ApiError(HttpStatus.BAD_REQUEST, message, ex));
 	}
 
 	@ExceptionHandler(Exception.class)
@@ -97,6 +84,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "error occurred", ex);
 		return ResponseHandler.error(apiError);
 	}
-	
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
+		ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+		apiError.setMessage(ex.getMessage());
+		return  ResponseHandler.error(apiError);
+	}
 
 }
