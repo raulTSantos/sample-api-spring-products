@@ -37,8 +37,8 @@ public class CategoryController {
 
 	@GetMapping
 	public ResponseEntity<Page<CategoryDTO>> retrieveAllDataPaginated(
-			@RequestParam(value = "pageNo", defaultValue = ApiConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
-			@RequestParam(value = "pageSize", defaultValue = ApiConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+			@RequestParam(value = "page", defaultValue = ApiConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+			@RequestParam(value = "size", defaultValue = ApiConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
 			@RequestParam(value = "sortBy", defaultValue = ApiConstants.DEFAULT_SORT_BY, required = false) String sortBy,
 			@RequestParam(value = "sortDir", defaultValue = ApiConstants.DEFAULT_SORT_DIRECT, required = false) String sortDir) {
 		
