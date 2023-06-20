@@ -32,7 +32,7 @@ public class WebSecurityConfiguration {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		http.authorizeRequests().antMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui.html", "/docs/**")
+		http.authorizeRequests().antMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui/index.html", "/docs/**")
 				.permitAll().anyRequest().authenticated();
 		// Add a filter to validate the tokens with every request
      	http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

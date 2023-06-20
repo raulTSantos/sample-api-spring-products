@@ -26,7 +26,8 @@ public class SignupRequest {
 	private String email;
 	
 	@NotBlank
-	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$@!%&*?])[A-Za-z\\d#$@!%&*?]{8,}$")
+	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$@!%&*?])[A-Za-z\\d#$@!%&*?]{8,}$",
+	message = "Debe contener entre mayusculas, minusculas y carcateres especiales con una logitud de 8.")
 	private String password;
 	
 	@NotBlank
