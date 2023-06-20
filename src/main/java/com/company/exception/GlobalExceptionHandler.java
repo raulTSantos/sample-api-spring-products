@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -66,7 +67,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			WebRequest request) {
 
 		if (ex.getCause() instanceof ConstraintViolationException) {
-			return ResponseHandler.error(new ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()));
+			return ResponseHandler.error(new ApiError(HttpStatus.CONFLICT,"Violacion a la base de datos.", ex.getCause()));
 		}
 		return ResponseHandler.error(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex));
 	}
@@ -81,7 +82,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleInternalServerError(Exception ex, WebRequest request) {
 		logger.error("handleInternalServerError {}\n", request.getContextPath(), ex);
-		ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "error occurred", ex);
+		ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
 		return ResponseHandler.error(apiError);
 	}
 
@@ -91,5 +92,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		apiError.setMessage(ex.getMessage());
 		return  ResponseHandler.error(apiError);
 	}
+	@ExceptionHandler(BadCredentialsException.class)
+	  public ResponseEntity<Object> handleException(BadCredentialsException exception, WebRequest webRequest) {
+
+	    ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+		apiError.setMessage(exception.getMessage());
+
+	    return ResponseHandler.error(apiError);
+	  }
 
 }
